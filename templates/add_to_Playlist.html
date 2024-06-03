@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add to Playlist</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 360px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 1.2em;
+            margin: 0;
+            padding: 0 0 10px 0;
+        }
+        h2 {
+            font-size: 1em;
+            margin: 10px 0 5px;
+            padding: 0;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        .playlist-options {
+            margin: 5px 0;
+        }
+        .playlist-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .playlist-name {
+            margin-left: 5px;
+            font-size: 0.85em;
+            color: #333;
+        }
+        .create-new {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+        .create-new span {
+            margin-left: 5px;
+            color: #007bff;
+            text-decoration: underline;
+            font-size: 0.85em;
+        }
+        .plus-icon {
+            background-color: #007bff;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        .plus-icon:hover {
+            background-color: #0056b3;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.85em;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .back-button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            border: none;
+            font-size: 0.85em;
+        }
+        .back-button:hover {
+            background-color: #218838;
+        }
+        .hidden {
+            display: none;
+        }
+        label {
+            font-size: 0.85em;
+        }
+        input[type="text"], select {
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add "{{ movie_name }}" to Playlist</h1>
+        <form method="POST" action="{{ url_for('add_to_playlist') }}">
+            <input type="hidden" name="movie_name" value="{{ movie_name }}">
+
+            <h2>Select from existing playlists:</h2>
+            <div class="playlist-options">
+                {% if playlists %}
+                    {% for playlist_name, details in playlists.items() %}
+                        <div class="playlist-option">
+                            <input type="checkbox" id="{{ playlist_name }}" name="selected_playlists" value="{{ playlist_name }}">
+                            <label for="{{ playlist_name }}" class="playlist-name">{{ playlist_name }} ({{ details.access }})</label>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No playlists available.</p>
+                {% endif %}
+                <div class="create-new" onclick="toggleNewPlaylist()">
+                    <button type="button" class="plus-icon">+</button>
+                    <span>Create new playlist</span>
+                </div>
+                <input type="text" id="new_playlist_title" name="new_playlist_title" placeholder="New Playlist Title" class="hidden">
+                <label for="new_playlist_access" id="new_playlist_access_label" class="hidden">Access:</label>
+                <select id="new_playlist_access" name="new_playlist_access" class="hidden">
+                    <option value="private">Private</option>
+                    <option value="public">Public</option>
+                </select>
+            </div>
+
+            <button type="submit" class="button">Add to Playlist</button>
+        </form>
+        <button class="back-button" onclick="window.location.href='{{ url_for('index') }}'">Back to Home</button>
+    </div>
+
+    <script>
+        function toggleNewPlaylist() {
+            const newPlaylistTitle = document.getElementById('new_playlist_title');
+            const newPlaylistAccess = document.getElementById('new_playlist_access');
+            const newPlaylistAccessLabel = document.getElementById('new_playlist_access_label');
+
+            if (newPlaylistTitle.classList.contains('hidden')) {
+                newPlaylistTitle.classList.remove('hidden');
+                newPlaylistAccess.classList.remove('hidden');
+                newPlaylistAccessLabel.classList.remove('hidden');
+            } else {
+                newPlaylistTitle.classList.add('hidden');
+                newPlaylistAccess.classList.add('hidden');
+                newPlaylistAccessLabel.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>

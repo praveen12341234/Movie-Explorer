@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unleash the Movie Buff in You</title>
+    <style>
+        /* CSS Styles */
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .header {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            color: #007bff;
+        }
+        .profile {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+        .profile img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .dropdown {
+            display: none;
+            position: absolute;
+            right: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .dropdown a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+            white-space: nowrap;
+        }
+        .dropdown a:hover {
+            background-color: #f0f0f0;
+        }
+        form {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 70%;
+            font-size: 16px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="submit"] {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .playlist {
+            margin-top: 20px;
+        }
+        .list-group {
+            list-style-type: none;
+            padding: 0;
+        }
+        .list-group-item {
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .list-group-item a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .movie-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px 0;
+        }
+        .movie-img {
+            width: 200px;
+            height: auto;
+            margin: 10px;
+            transition: transform 0.2s;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .movie-img:hover {
+            transform: scale(1.05);
+        }
+        .footer {
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        .footer a {
+            color: #fff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .view-btn {
+            padding: 5px 10px;
+            font-size: 14px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .view-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+    <script>
+        function toggleDropdown() {
+            var dropdown = document.getElementById('profileDropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function logout() {
+            window.location.href = "{{ url_for('logout') }}";
+        }
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.profile img')) {
+                var dropdowns = document.getElementsByClassName("dropdown");
+                for (var i = 0; i < dropdowns.length; i++) {
+                    var openDropdown = dropdowns[i];
+                    if (openDropdown.style.display === 'block') {
+                        openDropdown.style.display = 'none';
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Unleash the Movie Buff in You</h1>
+            <div class="profile" onclick="toggleDropdown()">
+                <img src="{{ url_for('static', filename='images/profile.png') }}" alt="Profile">
+                <div id="profileDropdown" class="dropdown">
+                    <a href="#" onclick="logout()">Logout</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Movie Search Form -->
+        <form method="POST" action="{{ url_for('index') }}">
+            <input type="text" name="movie_name" placeholder="Enter a movie name" required>
+            <input type="submit" value="Search">
+        </form>
+
+        <!-- Playlists Section -->
+        <div class="playlist">
+            <h3>Your Playlists</h3>
+            {% if playlists %}
+                <ul class="list-group">
+                    {% for playlist_name, playlist_data in playlists.items() %}
+                        <li class="list-group-item">
+                            <span>{{ playlist_name }}</span>
+                            <a href="{{ url_for('view_playlist', playlist_name=playlist_name) }}">
+                                <button class="view-btn">View Playlist</button>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No playlists created.</p>
+            {% endif %}
+        </div>
+
+        <!-- Movie Gallery Section -->
+        <div class="movie-gallery">
+            <!-- Example images of films -->
+            <img src="{{ url_for('static', filename='images/1.jpg') }}" alt="Film 1" class="movie-img">
+            <img src="{{ url_for('static', filename='images/gardiansofgalaxy.jpg') }}" alt="Film 2" class="movie-img">
+            <img src="{{ url_for('static', filename='images/2.jpg') }}" alt="Film 3" class="movie-img">
+            <img src="{{ url_for('static', filename='images/gravity.jpg') }}" alt="Film 4" class="movie-img">
+            <img src="{{ url_for('static', filename='images/cargo.jpeg') }}" alt="Film 5" class="movie-img">
+            <!-- Add more images as needed -->
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            <a href="/about">About Us</a> |
+            <a href="/contact">Contact Us</a> |
+            <a href="/terms">Terms of Service</a> |
+            <a href="/privacy">Privacy Policy</a>
+        </div>
+    </div>
+</body>
+</html>
