@@ -5,7 +5,7 @@ from firebase_admin import credentials, auth, firestore
 import requests
 import json
 from dotenv import load_dotenv
-import logging
+from urllib.parse import quote as url_quote
 
 # Load environment variables from .env file
 load_dotenv()
@@ -21,9 +21,6 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 OMDB_API_KEY = os.getenv('OMDB_API_KEY')
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -74,7 +71,7 @@ def logout():
     return redirect('/login')
 
 def search_movie(movie_name, playlists):
-    url = f"http://www.omdbapi.com/?t={movie_name}&apikey={OMDB_API_KEY}"
+    url = f"http://www.omdbapi.com/?t={url_quote(movie_name)}&apikey={OMDB_API_KEY}"
 
     response = requests.get(url)
     if response.status_code == 200:
@@ -107,7 +104,7 @@ def add_to_playlist():
 
     user_email = session['user_email']
     movie_name = request.form['movie_name']
-    selected_playlists = request.form.getlist('selected_playlists')
+    selected_playlist = request.form.get('selected_playlist')
     new_playlist_name = request.form.get('new_playlist_title')
     access_type = request.form.get('new_playlist_access', 'private')
 
@@ -120,14 +117,13 @@ def add_to_playlist():
             playlists[new_playlist_name] = {'movies': [], 'access': access_type}
         if movie_name not in playlists[new_playlist_name]['movies']:
             playlists[new_playlist_name]['movies'].append(movie_name)
-
-    for playlist_name in selected_playlists:
-        if playlist_name in playlists:
-            if movie_name not in playlists[playlist_name]['movies']:
-                playlists[playlist_name]['movies'].append(movie_name)
+    elif selected_playlist:
+        if selected_playlist in playlists:
+            if movie_name not in playlists[selected_playlist]['movies']:
+                playlists[selected_playlist]['movies'].append(movie_name)
 
     playlists_ref.set(playlists)
-    flash(f'Movie "{movie_name}" added to selected playlists.', 'success')
+    flash(f'Movie "{movie_name}" added to the playlist.', 'success')
 
     return redirect('/')
 
@@ -185,4 +181,4 @@ def about():
     return render_template('about.html')
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(debug=True, port=5000)
