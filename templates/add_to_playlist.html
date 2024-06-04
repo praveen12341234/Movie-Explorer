@@ -138,7 +138,7 @@
                 {% if playlists %}
                     {% for playlist_name, details in playlists.items() %}
                         <div class="playlist-option">
-                            <input type="checkbox" id="{{ playlist_name }}" name="selected_playlists" value="{{ playlist_name }}">
+                            <input type="radio" id="{{ playlist_name }}" name="selected_playlist" value="{{ playlist_name }}">
                             <label for="{{ playlist_name }}" class="playlist-name">{{ playlist_name }} ({{ details.access }})</label>
                         </div>
                     {% endfor %}
