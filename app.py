@@ -5,6 +5,7 @@ from firebase_admin import credentials, auth, firestore
 import requests
 import json
 from dotenv import load_dotenv
+import logging
 
 # Load environment variables from .env file
 load_dotenv()
@@ -20,6 +21,9 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 OMDB_API_KEY = os.getenv('OMDB_API_KEY')
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -181,4 +185,4 @@ def about():
     return render_template('about.html')
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=True)
