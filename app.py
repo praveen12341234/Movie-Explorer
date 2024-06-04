@@ -19,7 +19,7 @@ cred = credentials.Certificate(firebase_key_dict)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-OMDB_API_KEY = 'f2377158'
+OMDB_API_KEY = os.getenv('OMDB_API_KEY')
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
